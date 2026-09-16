@@ -16,10 +16,14 @@ steps:
       - .
 
   - name: gcr.io/cloud-builders/docker
-    args: [push, gcr.io/$PROJECT_ID/${_SERVICE}:$COMMIT_SHA]
+    args:
+      - push
+      - gcr.io/$PROJECT_ID/${_SERVICE}:$COMMIT_SHA
 
   - name: gcr.io/cloud-builders/docker
-    args: [push, gcr.io/$PROJECT_ID/${_SERVICE}:latest]
+    args:
+      - push
+      - gcr.io/$PROJECT_ID/${_SERVICE}:latest
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
