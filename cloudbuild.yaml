@@ -40,3 +40,7 @@ steps:
 images:
   - gcr.io/$PROJECT_ID/${_SERVICE}:$COMMIT_SHA
   - gcr.io/$PROJECT_ID/${_SERVICE}:latest
+
+# Required when the trigger uses a user-managed service account.
+options:
+  logging: CLOUD_LOGGING_ONLY
