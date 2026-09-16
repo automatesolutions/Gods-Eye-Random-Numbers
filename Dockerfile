@@ -7,7 +7,8 @@ COPY src ./src
 RUN npm run build
 
 FROM nginx:1.27-alpine
-RUN rm -f /etc/nginx/conf.d/default.conf
+RUN apk add --no-cache curl \
+ && rm -f /etc/nginx/conf.d/default.conf
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 COPY --from=build /app/dist /usr/share/nginx/html
