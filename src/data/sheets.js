@@ -164,10 +164,6 @@ export function sheetConfigured(gameId) {
 
 export async function loadHistory(gameId, max) {
   const direct = sheetUrl(gameId);
-  if (!direct) {
-    return { draws: [], stats: buildStats([], 1, max), offline: true, error: null, fetchedAt: null };
-  }
-
   const key = cacheKey(gameId);
   try {
     const raw = sessionStorage.getItem(key);
@@ -189,7 +185,8 @@ export async function loadHistory(gameId, max) {
     /* ignore bad cache */
   }
 
-  const urls = [`/_sheets/${gameId}`, direct];
+  const urls = [`/_sheets/${gameId}`];
+  if (direct) urls.push(direct);
   let lastErr = 'could not fetch sheet';
   for (const url of urls) {
     try {
@@ -227,11 +224,13 @@ export async function loadHistory(gameId, max) {
     }
   }
 
+  const quiet =
+    !direct && (lastErr === 'not a CSV' || lastErr === 'HTTP 404' || lastErr === 'HTTP 500');
   return {
     draws: [],
     stats: buildStats([], 1, max),
     offline: true,
-    error: lastErr,
+    error: quiet ? null : lastErr,
     fetchedAt: null,
   };
 }

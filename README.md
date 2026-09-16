@@ -84,9 +84,61 @@ src/engine/         # FBM, LCG / Box–Muller / OU, peak pick
 src/data/sheets.js  # CSV fetch + parse + stats
 src/data/daily.js   # daily lock in localStorage
 src/ui/             # DOM + canvases
-netlify.toml        # static build
+Dockerfile          # Cloud Run image (nginx + sheet proxy)
+cloudbuild.yaml     # build image and deploy Cloud Run
+netlify.toml        # optional Netlify static build
 ```
 
-## Deploy
+## Deploy on Google Cloud (Cloud Run)
 
-Netlify: build command `npm run build`, publish directory `dist`. Set `VITE_SHEET_42` … `VITE_SHEET_58` in the host environment so history works in production.
+The app is a static site plus a same-origin `/_sheets/{42|45|49|55|58}` proxy so the browser can load Google CSV without CORS. Cloud Run is the intended GCP target for project `gods-eye-random`.
+
+### One-time setup
+
+In [Google Cloud Console](https://console.cloud.google.com/) (project **Gods Eye Random** / `gods-eye-random`):
+
+1. Enable **Cloud Run**, **Cloud Build**, and **Artifact Registry** (or Container Registry).
+2. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) and log in:
+
+```bash
+gcloud auth login
+gcloud config set project gods-eye-random
+```
+
+### Deploy from this folder
+
+```bash
+gcloud run deploy gods-eye-predictor \
+  --source . \
+  --region asia-southeast1 \
+  --allow-unauthenticated \
+  --port 8080
+```
+
+Then attach the sheet URLs (same values as local `.env`; do not put them in git):
+
+```bash
+gcloud run services update gods-eye-predictor \
+  --region asia-southeast1 \
+  --set-env-vars ^;^VITE_SHEET_42=YOUR_42_URL;VITE_SHEET_45=YOUR_45_URL;VITE_SHEET_49=YOUR_49_URL;VITE_SHEET_55=YOUR_55_URL;VITE_SHEET_58=YOUR_58_URL
+```
+
+On Linux/macOS use commas instead of `^;^` / `;`:
+
+```bash
+gcloud run services update gods-eye-predictor \
+  --region asia-southeast1 \
+  --set-env-vars VITE_SHEET_42=YOUR_42_URL,VITE_SHEET_45=YOUR_45_URL,VITE_SHEET_49=YOUR_49_URL,VITE_SHEET_55=YOUR_55_URL,VITE_SHEET_58=YOUR_58_URL
+```
+
+Cloud Run prints a `https://…run.app` URL. History should show **history prior** after a refresh.
+
+You can also set those variables in **Cloud Run → gods-eye-predictor → Edit & deploy new revision → Variables & secrets**.
+
+### Deploy from GitHub
+
+Connect the `Gods-Eye-Random-Numbers` repo to **Cloud Build** with `cloudbuild.yaml` (region `asia-southeast1`, service `gods-eye-predictor`). After the first image deploy, set `VITE_SHEET_*` on the Cloud Run service as above. Later builds keep those env vars unless you replace them.
+
+### Netlify (optional)
+
+Build command `npm run build`, publish directory `dist`. Set `VITE_SHEET_42` … `VITE_SHEET_58` in the host environment so the client and `/_sheets/*` redirects work in production.
