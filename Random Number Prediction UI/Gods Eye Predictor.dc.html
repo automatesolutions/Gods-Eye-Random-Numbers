@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+html,body{margin:0;background:#0d0c0b;font-family:Archivo,system-ui,sans-serif}
+.dv-turn{background:#0d0c0b}
+a{color:#e8a13c}a:hover{color:#f5c27a}
+input{font-family:"IBM Plex Mono",monospace}
+.dv-turn{padding:44px 48px 36px;border-bottom:1px solid rgba(255,255,255,.07);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 22px}
+.dv-tid{font:600 10px "IBM Plex Mono",monospace;padding:3px 7px;background:#e8a13c;color:#0d0c0b;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 Archivo,sans-serif;color:#f2ede6}
+.dv-opts{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px "IBM Plex Mono",monospace;padding:3px 7px;background:rgba(255,255,255,.1);color:#f2ede6;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 "IBM Plex Mono",monospace;color:rgba(242,237,230,.5)}
+.dv-card{max-width:100%;border:1px solid rgba(255,255,255,.1);border-radius:6px;overflow:hidden}
+.dv-opt:target .dv-oid{background:#e8a13c;color:#0d0c0b}
+.dv-next{margin:24px 0 0;font:12px/1.6 "IBM Plex Mono",monospace;color:rgba(242,237,230,.42)}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.2}}
+</style></helmet>
+
+<section class="dv-turn" id="brief">
+<div class="dv-thd"><a class="dv-tid" href="#brief">00</a><span class="dv-tname">Brief &amp; assumptions</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;max-width:1160px">
+<div><div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#e8a13c;margin-bottom:9px">WHAT YOU ASKED FOR</div><p style="font:400 13px/1.65 Archivo,sans-serif;color:rgba(242,237,230,.72);margin:0;text-wrap:pretty">Six predicted numbers, drawn from a range you can edit, laid out in space, answering automatically. Every control below is live — edit the range and the prediction re-forms.</p></div>
+<div><div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#e8a13c;margin-bottom:9px">HOW IT PICKS</div><p style="font:400 13px/1.65 Archivo,sans-serif;color:rgba(242,237,230,.72);margin:0;text-wrap:pretty">The God's Eye lab's own math: a 4-octave value-noise FBM field is laid across the number pool, and the six highest peaks are the draw. Real computation, not a fake chart.</p></div>
+<div><div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#e8a13c;margin-bottom:9px">"IN SPACE"</div><p style="font:400 13px/1.65 Archivo,sans-serif;color:rgba(242,237,230,.72);margin:0;text-wrap:pretty">I read that two ways and built both: a flat field strip across the range (<a class="dv-oid" href="#1a">1a</a>), and a true orbital star-field where every candidate is a point of light (<a class="dv-oid" href="#1b">1b</a>).</p></div>
+<div><div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#e8a13c;margin-bottom:9px">OPEN QUESTIONS</div><p style="font:400 13px/1.65 Archivo,sans-serif;color:rgba(242,237,230,.72);margin:0;text-wrap:pretty">Desktop or phone first? Should past draws be kept and scored? And the honest one: independent draws can't be forecast, so do you want the UI to admit that or stay in-character?</p></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Three directions · all sharing one live engine</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Console — operator rail, field strip across the pool</div>
+<div class="dv-card" style="width:1080px;background:#14120f">
+  <div style="display:flex;align-items:center;gap:12px;height:48px;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.09);background:#100e0c">
+    <div style="width:8px;height:8px;border-radius:50%;background:#e8a13c;animation:blip 2.4s infinite"></div>
+    <span style="font:700 12.5px Archivo,sans-serif;letter-spacing:.13em;color:#f2ede6">GOD'S EYE</span>
+    <span style="font:500 11px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.38);letter-spacing:.06em">/ predictor</span>
+    <div style="flex:1"></div>
+    <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(242,237,230,.4)">DRAW {{ drawLabel }}</span>
+    <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#e8a13c">{{ modeLabel }}</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:232px 1fr">
+    <div style="border-right:1px solid rgba(255,255,255,.09);padding:20px 18px;display:flex;flex-direction:column;gap:26px;background:#110f0d">
+      <div>
+        <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.35);margin-bottom:12px">RANGE</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="number" value="{{ min }}" onChange="{{ onMin }}" style="width:100%;min-width:0;background:#0d0c0b;border:1px solid rgba(255,255,255,.14);border-radius:4px;color:#f2ede6;font-size:19px;font-weight:500;padding:9px 10px;outline:none" />
+          <span style="font:400 13px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.3)">to</span>
+          <input type="number" value="{{ max }}" onChange="{{ onMax }}" style="width:100%;min-width:0;background:#0d0c0b;border:1px solid rgba(255,255,255,.14);border-radius:4px;color:#f2ede6;font-size:19px;font-weight:500;padding:9px 10px;outline:none" />
+        </div>
+        <div style="margin-top:9px;font:400 10.5px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.32)">pool {{ poolLabel }} candidates</div>
+      </div>
+      <div>
+        <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.35);margin-bottom:12px">PICKS</div>
+        <div style="display:flex;gap:6px">
+          <button onClick="{{ decCount }}" style="flex:1;background:#0d0c0b;border:1px solid rgba(255,255,255,.14);border-radius:4px;color:#f2ede6;font:500 15px 'IBM Plex Mono',monospace;padding:7px 0;cursor:pointer">−</button>
+          <div style="flex:1.4;display:flex;align-items:center;justify-content:center;font:600 17px 'IBM Plex Mono',monospace;color:#f2ede6">{{ count }}</div>
+          <button onClick="{{ incCount }}" style="flex:1;background:#0d0c0b;border:1px solid rgba(255,255,255,.14);border-radius:4px;color:#f2ede6;font:500 15px 'IBM Plex Mono',monospace;padding:7px 0;cursor:pointer">+</button>
+        </div>
+      </div>
+      <div>
+        <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.35);margin-bottom:12px">FIELD</div>
+        <div style="display:flex;justify-content:space-between;font:400 10.5px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.5);margin-bottom:5px"><span>octaves</span><span style="color:#f2ede6">{{ octaves }}</span></div>
+        <input type="range" min="1" max="6" step="1" value="{{ octaves }}" onChange="{{ onOct }}" style="width:100%;accent-color:#e8a13c;margin:0 0 16px" />
+        <div style="display:flex;justify-content:space-between;font:400 10.5px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.5);margin-bottom:5px"><span>scale</span><span style="color:#f2ede6">{{ scaleLabel }}</span></div>
+        <input type="range" min="10" max="90" step="1" value="{{ scaleRaw }}" onChange="{{ onScale }}" style="width:100%;accent-color:#e8a13c;margin:0" />
+      </div>
+      <div>
+        <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.35);margin-bottom:10px">CYCLE</div>
+        <button onClick="{{ toggleLock }}" style="width:100%;background:{{ lockBg }};border:1px solid {{ lockBorder }};border-radius:4px;color:{{ lockInk }};font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.12em;padding:10px 0;cursor:pointer">{{ lockLabel }}</button>
+        <div style="margin-top:14px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><div style="height:100%;background:#e8a13c;width:{{ progressPct }}"></div></div>
+        <div style="margin-top:7px;font:400 10px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.32)">{{ cycleLabel }}</div>
+      </div>
+      <div style="margin-top:auto;font:400 10px/1.7 'IBM Plex Mono',monospace;color:rgba(242,237,230,.25)">fbm · value noise<br />4-oct · smoothstep<br />src thermal.js</div>
+    </div>
+
+    <div style="padding:22px 24px 24px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px">
+        <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.35)">PREDICTION</span>
+        <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.3)">peaks of the correlated field</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat({{ count }},minmax(0,1fr));gap:10px">
+        <sc-for list="{{ picks }}" as="p" hint-placeholder-count="6">
+          <div style="background:#100e0c;border:1px solid rgba(232,161,60,.28);border-radius:5px;padding:14px 12px 12px">
+            <div style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:rgba(232,161,60,.7);margin-bottom:6px">PEAK {{ p.rankLabel }}</div>
+            <div style="font:600 40px/1 Archivo,sans-serif;color:#f2ede6;letter-spacing:-.02em">{{ p.label }}</div>
+            <div style="margin-top:11px;height:3px;background:rgba(255,255,255,.09);border-radius:2px;overflow:hidden"><div style="height:100%;background:#e8a13c;width:{{ p.confPct }}"></div></div>
+            <div style="margin-top:6px;font:400 9.5px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.4)">{{ p.confPct }} conf</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:24px;display:flex;align-items:baseline;gap:10px;margin-bottom:10px">
+        <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.35)">FIELD ACROSS POOL</span>
+        <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.3)">live · drifting</span>
+      </div>
+      <div style="background:#100e0c;border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:12px">
+        <canvas ref="{{ heatRef }}" style="width:100%;height:158px;display:block"></canvas>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font:400 10px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.3)"><span>{{ min }}</span><span>{{ midLabel }}</span><span>{{ max }}</span></div>
+      </div>
+
+      <div style="margin-top:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);border-radius:5px;overflow:hidden">
+        <div style="background:#100e0c;padding:13px 14px"><div style="font:400 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(242,237,230,.35);margin-bottom:5px">PEAK SEPARATION</div><div style="font:500 16px 'IBM Plex Mono',monospace;color:#f2ede6">{{ sepLabel }}</div></div>
+        <div style="background:#100e0c;padding:13px 14px"><div style="font:400 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(242,237,230,.35);margin-bottom:5px">FIELD ENERGY</div><div style="font:500 16px 'IBM Plex Mono',monospace;color:#f2ede6">{{ energyLabel }}</div></div>
+        <div style="background:#100e0c;padding:13px 14px"><div style="font:400 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(242,237,230,.35);margin-bottom:5px">DRIFT RATE</div><div style="font:500 16px 'IBM Plex Mono',monospace;color:#f2ede6">0.25 /s</div></div>
+        <div style="background:#100e0c;padding:13px 14px"><div style="font:400 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(242,237,230,.35);margin-bottom:5px">CALIBRATION</div><div style="font:500 16px 'IBM Plex Mono',monospace;color:#6fa8b8">uniform prior</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Orbit — every candidate a point of light, six locked</div>
+<div class="dv-card" style="width:620px;background:#0b0a09">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 18px 0">
+    <span style="font:700 11.5px Archivo,sans-serif;letter-spacing:.16em;color:rgba(242,237,230,.8)">ORBITAL DRAW</span>
+    <div style="flex:1"></div>
+    <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:rgba(242,237,230,.35)">{{ poolLabel }} BODIES · {{ count }} LOCKED</span>
+  </div>
+  <canvas ref="{{ spaceRef }}" style="width:100%;height:400px;display:block"></canvas>
+  <div style="padding:0 18px 18px">
+    <div style="display:grid;grid-template-columns:repeat({{ count }},minmax(0,1fr));gap:8px">
+      <sc-for list="{{ picks }}" as="p" hint-placeholder-count="6">
+        <div style="text-align:center">
+          <div style="font:600 30px/1 Archivo,sans-serif;color:#f2ede6;letter-spacing:-.02em">{{ p.label }}</div>
+          <div style="margin-top:8px;height:2px;background:rgba(255,255,255,.1);overflow:hidden"><div style="height:100%;background:#6fa8b8;width:{{ p.confPct }}"></div></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:12px">
+      <div style="flex:1;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><div style="height:100%;background:#6fa8b8;width:{{ progressPct }}"></div></div>
+      <span style="font:400 10px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.35);white-space:nowrap">{{ cycleLabel }}</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Pocket — phone, six numbers and nothing else</div>
+<div class="dv-card" style="width:352px;background:#100e0c;border-radius:26px">
+  <div style="padding:26px 22px 24px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:6px;height:6px;border-radius:50%;background:#e8a13c;animation:blip 2.4s infinite"></div>
+      <span style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.18em;color:rgba(242,237,230,.5)">AUTO · DRAW {{ drawLabel }}</span>
+    </div>
+    <div>
+      <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(242,237,230,.32);margin-bottom:10px">RANGE</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="number" value="{{ min }}" onChange="{{ onMin }}" style="width:100%;min-width:0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.18);color:#f2ede6;font-size:24px;font-weight:500;padding:4px 0;outline:none" />
+        <span style="font:400 15px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.25)">—</span>
+        <input type="number" value="{{ max }}" onChange="{{ onMax }}" style="width:100%;min-width:0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.18);color:#f2ede6;font-size:24px;font-weight:500;padding:4px 0;outline:none;text-align:right" />
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <sc-for list="{{ picks }}" as="p" hint-placeholder-count="6">
+        <div style="aspect-ratio:1;border:1px solid rgba(232,161,60,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 30px Archivo,sans-serif;color:#f2ede6;background:#0d0c0b">{{ p.label }}</div>
+      </sc-for>
+    </div>
+    <div>
+      <canvas ref="{{ sparkRef }}" style="width:100%;height:56px;display:block"></canvas>
+      <div style="margin-top:10px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><div style="height:100%;background:#e8a13c;width:{{ progressPct }}"></div></div>
+      <div style="margin-top:8px;display:flex;justify-content:space-between;font:400 10px 'IBM Plex Mono',monospace;color:rgba(242,237,230,.32)"><span>{{ cycleLabel }}</span><span>{{ energyLabel }} energy</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "take <a class="dv-oid" href="#1b">1b</a> full-screen with <a class="dv-oid" href="#1a">1a</a>'s rail" · "add a draw history that scores past predictions" · "make the orbit view the phone screen"</p>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;rangeMin&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Draw&quot;},&quot;rangeMax&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:49,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Draw&quot;},&quot;pickCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:6,&quot;min&quot;:2,&quot;max&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Draw&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.heatRef = React.createRef();
+    this.spaceRef = React.createRef();
+    this.sparkRef = React.createRef();
+    this.state = {
+      min: props.rangeMin ?? 1,
+      max: props.rangeMax ?? 49,
+      count: props.pickCount ?? 6,
+      octaves: 4,
+      scaleRaw: 34,
+      locked: false,
+      picks: [],
+      draws: 0,
+      progress: 0,
+      energy: 0,
+      sep: 0
+    };
+    this.vals = [];
+  }
+
+  fract(x) { return x - Math.floor(x); }
+  mix(a, b, t) { return a + (b - a) * t; }
+  hash2(x, y) {
+    let px = this.fract(x * 0.1031), py = this.fract(y * 0.1031), pz = this.fract(x * 0.1031);
+    const d = px * (py + 33.33) + py * (pz + 33.33) + pz * (px + 33.33);
+    px += d; py += d; pz += d;
+    return this.fract((px + py) * pz);
+  }
+  valueNoise(x, y) {
+    const ix = Math.floor(x), iy = Math.floor(y);
+    let fx = x - ix, fy = y - iy;
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    const a = this.hash2(ix, iy), b = this.hash2(ix + 1, iy);
+    const c = this.hash2(ix, iy + 1), d = this.hash2(ix + 1, iy + 1);
+    return this.mix(this.mix(a, b, fx), this.mix(c, d, fx), fy);
+  }
+  fbm(x, y) {
+    let v = 0, a = 0.5, px = x, py = y;
+    const oct = this.state.octaves;
+    for (let i = 0; i < oct; i++) { v += a * this.valueNoise(px, py); px = px * 2 + 100; py = py * 2 + 100; a *= 0.5; }
+    return v;
+  }
+
+  pool() {
+    const { min, max } = this.state;
+    const lo = Math.min(min, max), hi = Math.max(min, max);
+    return { lo, hi, n: Math.max(2, hi - lo + 1) };
+  }
+
+  field(t) {
+    const { lo, n } = this.pool();
+    const scale = this.state.scaleRaw / 10;
+    const out = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1)) * scale;
+      out[i] = { n: lo + i, v: this.fbm(x + t * 0.18, t * 0.31) };
+    }
+    return out;
+  }
+
+  extent(vals) {
+    let lo = Infinity, hi = -Infinity;
+    for (const d of vals) { if (d.v < lo) lo = d.v; if (d.v > hi) hi = d.v; }
+    return [lo, hi || 1];
+  }
+
+  commit() {
+    const vals = this.vals;
+    if (!vals.length) return;
+    const count = Math.min(this.state.count, vals.length);
+    const [lo, hi] = this.extent(vals);
+    const ranked = [...vals].sort((a, b) => b.v - a.v);
+    const gap = Math.max(1, Math.floor(vals.length / (count * 2)));
+    const sorted = [];
+    for (let pass = 0; pass < 2 && sorted.length < count; pass++) {
+      const k = pass === 0 ? gap : 1;
+      for (const d of ranked) {
+        if (sorted.length >= count) break;
+        if (sorted.some(s => s.n === d.n || Math.abs(s.n - d.n) < k)) continue;
+        sorted.push(d);
+      }
+    }
+    const chosen = new Set(sorted.map(d => d.n));
+    const picks = sorted.slice().sort((a, b) => a.n - b.n).map((d, i) => ({
+      label: String(d.n).padStart(2, '0'),
+      rankLabel: String(i + 1).padStart(2, '0'),
+      confPct: Math.round(46 + 50 * ((d.v - lo) / (hi - lo || 1))) + '%'
+    }));
+    const ns = sorted.map(d => d.n).sort((a, b) => a - b);
+    let sep = 0;
+    for (let i = 1; i < ns.length; i++) sep += ns[i] - ns[i - 1];
+    this.chosen = chosen;
+    this.setState({
+      picks,
+      draws: this.state.draws + 1,
+      energy: (hi - lo),
+      sep: ns.length > 1 ? sep / (ns.length - 1) : 0
+    });
+    this.cycleStart = performance.now();
+  }
+
+  componentDidMount() {
+    this.t0 = performance.now();
+    this.cycleStart = this.t0;
+    this.lastPush = 0;
+    this.vals = this.field(0);
+    this.commit();
+    this.loop = (now) => {
+      this.raf = requestAnimationFrame(this.loop);
+      const t = (now - this.t0) / 1000;
+      this.vals = this.field(t);
+      this.draw(t);
+      if (now - this.lastPush > 90) {
+        this.lastPush = now;
+        const p = Math.min(1, (now - this.cycleStart) / 6500);
+        this.setState({ progress: p });
+      }
+      if (!this.state.locked && now - this.cycleStart > 6500) this.commit();
+      else if (this.state.locked) this.cycleStart = now;
+    };
+    this.raf = requestAnimationFrame(this.loop);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
+
+  fit(ref) {
+    const c = ref.current;
+    if (!c) return null;
+    const r = c.getBoundingClientRect();
+    if (!r.width) return null;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (c.width !== Math.round(r.width * dpr)) { c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr); }
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, r.width, r.height);
+    return { ctx, w: r.width, h: r.height };
+  }
+
+  draw(t) {
+    const vals = this.vals;
+    const [lo, hi] = this.extent(vals);
+    const norm = d => (d.v - lo) / (hi - lo || 1);
+    const chosen = this.chosen || new Set();
+
+    const a = this.fit(this.heatRef);
+    if (a) {
+      const { ctx, w, h } = a;
+      const n = vals.length;
+      const bw = w / n;
+      for (let i = 0; i < n; i++) {
+        const v = norm(vals[i]);
+        const bh = 8 + v * (h - 18);
+        const sel = chosen.has(vals[i].n);
+        ctx.fillStyle = sel ? 'rgba(232,161,60,0.95)' : 'rgba(242,237,230,' + (0.08 + v * 0.2) + ')';
+        ctx.fillRect(i * bw + 0.5, h - bh, Math.max(1, bw - 1.5), bh);
+      }
+      ctx.strokeStyle = 'rgba(111,168,184,0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const x = i * bw + bw / 2, y = h - 8 - norm(vals[i]) * (h - 18);
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    const b = this.fit(this.spaceRef);
+    if (b) {
+      const { ctx, w, h } = b;
+      const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.44;
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      for (let k = 1; k <= 3; k++) { ctx.beginPath(); ctx.arc(cx, cy, R * k / 3, 0, Math.PI * 2); ctx.stroke(); }
+      const n = vals.length;
+      for (let i = 0; i < n; i++) {
+        const v = norm(vals[i]);
+        const ang = i * 2.399963 + t * 0.06;
+        const rad = Math.sqrt((i + 0.5) / n) * R;
+        const x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad;
+        const sel = chosen.has(vals[i].n);
+        if (sel) {
+          ctx.fillStyle = 'rgba(232,161,60,1)';
+          ctx.beginPath(); ctx.arc(x, y, 3.4, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = 'rgba(232,161,60,0.45)';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.arc(x, y, 9 + Math.sin(t * 2 + i) * 1.6, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = 'rgba(242,237,230,0.92)';
+          ctx.font = '600 11px "IBM Plex Mono", monospace';
+          ctx.fillText(String(vals[i].n), x + 13, y + 4);
+        } else {
+          ctx.fillStyle = 'rgba(111,168,184,' + (0.12 + v * 0.55) + ')';
+          ctx.beginPath(); ctx.arc(x, y, 0.8 + v * 1.9, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.14)';
+      ctx.beginPath(); ctx.arc(cx, cy, 1.6, 0, Math.PI * 2); ctx.fill();
+    }
+
+    const c = this.fit(this.sparkRef);
+    if (c) {
+      const { ctx, w, h } = c;
+      const n = vals.length;
+      ctx.strokeStyle = 'rgba(232,161,60,0.8)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const x = (i / (n - 1)) * w, y = h - 4 - norm(vals[i]) * (h - 10);
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+      for (let i = 0; i < n; i++) {
+        if (!chosen.has(vals[i].n)) continue;
+        const x = (i / (n - 1)) * w, y = h - 4 - norm(vals[i]) * (h - 10);
+        ctx.fillStyle = 'rgba(242,237,230,0.95)';
+        ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
+  clampRange(min, max) {
+    const count = this.state.count;
+    let lo = Math.round(min), hi = Math.round(max);
+    if (!Number.isFinite(lo)) lo = 1;
+    if (!Number.isFinite(hi)) hi = lo + count;
+    if (hi - lo + 1 < count) hi = lo + count - 1;
+    if (hi - lo + 1 > 400) hi = lo + 399;
+    return [lo, hi];
+  }
+
+  renderVals() {
+    const s = this.state;
+    const { lo, hi, n } = this.pool();
+    return {
+      min: s.min, max: s.max, count: s.count, octaves: s.octaves, scaleRaw: s.scaleRaw,
+      picks: s.picks,
+      heatRef: this.heatRef, spaceRef: this.spaceRef, sparkRef: this.sparkRef,
+      poolLabel: String(n),
+      midLabel: String(Math.round((lo + hi) / 2)),
+      drawLabel: String(s.draws).padStart(4, '0'),
+      modeLabel: s.locked ? 'HELD' : 'AUTO',
+      scaleLabel: (s.scaleRaw / 10).toFixed(1),
+      progressPct: Math.round(s.progress * 100) + '%',
+      cycleLabel: s.locked ? 'cycle held' : 'next draw ' + Math.max(0, 6.5 - s.progress * 6.5).toFixed(1) + 's',
+      sepLabel: s.sep.toFixed(1),
+      energyLabel: s.energy.toFixed(3),
+      lockLabel: s.locked ? 'RESUME AUTO' : 'HOLD DRAW',
+      lockBg: s.locked ? '#e8a13c' : '#0d0c0b',
+      lockBorder: s.locked ? '#e8a13c' : 'rgba(255,255,255,.14)',
+      lockInk: s.locked ? '#0d0c0b' : '#f2ede6',
+      onMin: e => { const [a, b] = this.clampRange(parseInt(e.target.value, 10), s.max); this.setState({ min: a, max: b }, () => { this.vals = this.field((performance.now() - this.t0) / 1000); this.commit(); }); },
+      onMax: e => { const [a, b] = this.clampRange(s.min, parseInt(e.target.value, 10)); this.setState({ min: a, max: b }, () => { this.vals = this.field((performance.now() - this.t0) / 1000); this.commit(); }); },
+      onOct: e => this.setState({ octaves: parseInt(e.target.value, 10) }),
+      onScale: e => this.setState({ scaleRaw: parseInt(e.target.value, 10) }),
+      incCount: () => this.setState({ count: Math.min(12, s.count + 1) }, () => this.commit()),
+      decCount: () => this.setState({ count: Math.max(2, s.count - 1) }, () => this.commit()),
+      toggleLock: () => this.setState({ locked: !s.locked })
+    };
+  }
+}
+</script>
+</body>
+</html>

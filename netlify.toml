@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Same-origin CSV proxy rules are written into dist/_redirects at build time
+# from src/config.js (SHEET_URLS / VITE_SHEET_*). Add URLs there, then rebuild.

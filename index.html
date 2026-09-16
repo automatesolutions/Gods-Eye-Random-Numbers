@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>God's Eye Predictor</title>
+  <meta name="description" content="Correlated-field lab: six numbers from a history-biased FBM pool. Not a forecast of independent draws." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="blip" aria-hidden="true"></div>
+      <span class="brand">GOD'S EYE</span>
+      <span class="sub">/ predictor</span>
+      <div class="spacer"></div>
+      <span class="meta" id="draw-label">DRAW 0000</span>
+      <span class="mode" id="mode-label">AUTO</span>
+    </header>
+
+    <div class="body">
+      <aside class="rail">
+        <div>
+          <div class="lbl">GAME</div>
+          <div class="chips" id="game-chips"></div>
+        </div>
+
+        <div>
+          <div class="lbl">RANGE</div>
+          <div class="range-row">
+            <input id="min" type="number" inputmode="numeric" />
+            <span>to</span>
+            <input id="max" type="number" inputmode="numeric" />
+          </div>
+          <div class="hint" id="pool-label">pool — candidates</div>
+        </div>
+
+        <div>
+          <div class="lbl">PICKS</div>
+          <div class="hint" id="picks-lock">Always six numbers. The app never draws a 7th ball.</div>
+        </div>
+
+        <div>
+          <div class="lbl">FIELD</div>
+          <div class="slider-row"><span>octaves</span><span class="val" id="oct-label">4</span></div>
+          <input id="octaves" type="range" min="1" max="6" step="1" />
+          <div class="hint">Layers of detail in the hill-line. 1 is a smooth blob; 4–6 add small wiggles so more numbers can become peaks.</div>
+          <div class="slider-row"><span>scale</span><span class="val" id="scale-label">3.4</span></div>
+          <input id="scale" type="range" min="10" max="90" step="1" />
+          <div class="hint">How many hills are stretched across 1…N. Low scale = few wide hills; high scale = many narrow ones, so picks spread more.</div>
+        </div>
+
+        <div>
+          <div class="lbl">HISTORY WEIGHT</div>
+          <div class="slider-row"><span>α mix</span><span class="val" id="alpha-label">0.35</span></div>
+          <input id="alpha" type="range" min="0" max="80" step="1" />
+          <div class="hint">Share of the score that comes from the 10-year sheet vs the live field. 0 = FBM only. 0.35 = mixed. Higher = more pull from historical frequency.</div>
+        </div>
+
+        <div>
+          <div class="lbl">SEED</div>
+          <input id="seed" class="seed" type="text" placeholder="optional · reproducible lab" autocomplete="off" />
+          <div class="hint">Used the next time you generate. Same seed can replay the same lab draw.</div>
+        </div>
+
+        <div>
+          <div class="lbl">DRAW</div>
+          <div class="chips" id="mode-chips">
+            <button type="button" data-mode="daily" class="active">Daily</button>
+            <button type="button" data-mode="manual">Manual</button>
+          </div>
+          <button id="generate" class="lock" type="button" style="margin-top:12px">GENERATE TODAY</button>
+          <div class="hint" id="draw-hint">One six-number set per game per calendar day. Manual lets you resample anytime.</div>
+        </div>
+
+        <div>
+          <div class="lbl">SHEET</div>
+          <div class="status" id="sheet-status">history offline</div>
+        </div>
+
+        <div class="foot-note">fbm · value noise<br />4-oct · smoothstep<br />src thermal.js</div>
+      </aside>
+
+      <main class="main">
+        <div class="sec-head">
+          <span class="k">PREDICTION</span>
+          <span class="d">peaks of the correlated field</span>
+        </div>
+        <div class="picks" id="picks"></div>
+
+        <div class="viz">
+          <div>
+            <div class="sec-head">
+              <span class="k">FIELD ACROSS POOL</span>
+              <span class="d" id="field-caption">live · drifting</span>
+            </div>
+            <div class="panel">
+              <canvas id="heat"></canvas>
+              <div class="axis">
+                <span id="axis-min">1</span>
+                <span id="axis-mid">—</span>
+                <span id="axis-max">49</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel orbit">
+            <div class="orbit-head">
+              <span class="k">ORBITAL DRAW</span>
+              <span class="d" id="orbit-meta">— BODIES · 6 LOCKED</span>
+            </div>
+            <canvas id="orbit"></canvas>
+          </div>
+        </div>
+
+        <div class="history">
+          <div class="sec-head">
+            <span class="k">RECENT DRAWS</span>
+            <span class="d">from published sheet · last 8</span>
+          </div>
+          <div class="strip" id="history-strip">
+            <div class="empty-hist">No history loaded. Publish the sheet and paste CSV URLs in src/config.js.</div>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">PEAK SEPARATION</div>
+            <div class="v" id="sep-label">—</div>
+            <div class="mean">Average gap between the six picks. Higher = more spread across the pool; lower = they sit closer together.</div>
+          </div>
+          <div class="metric">
+            <div class="k">FIELD ENERGY</div>
+            <div class="v" id="energy-label">—</div>
+            <div class="mean">How uneven the live field is right now. Higher = a few tall hills; lower = a flatter, more even surface.</div>
+          </div>
+          <div class="metric">
+            <div class="k">DRIFT RATE</div>
+            <div class="v" id="drift-label">0.18 /s</div>
+            <div class="mean">How fast that field walks forward in time. It is the FBM speed, not how often official draws happen.</div>
+          </div>
+          <div class="metric">
+            <div class="k">CALIBRATION</div>
+            <div class="v cyan" id="cal-label">uniform prior</div>
+            <div class="mean" id="cal-mean">No sheet loaded. Every number starts equal; only the live field chooses the six peaks.</div>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          Independent official draws cannot be forecast. This lab samples a history-biased correlated field
+          (FBM value noise, recency, co-occurrence) — the same idea as the
+          <a href="https://gods-eye-random-numbers.netlify.app/" target="_blank" rel="noreferrer">God's Eye random-number lab</a>.
+        </p>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
