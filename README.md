@@ -42,18 +42,29 @@ Do not commit `.env`. For Netlify, add the same `VITE_SHEET_*` variables in the 
 
 | Control | Meaning |
 | --- | --- |
-| **Game** | Preset 6/42 … 6/58. Sets range `1…N` and loads that sheet. |
-| **Range** | Editable min/max. A custom range drops official-game history. |
-| **Picks** | Always six numbers. |
-| **Octaves** | Detail in the hill-line (1 = smooth, 4–6 = more wiggles). |
-| **Scale** | How many hills are stretched across the pool. |
+| **Game** (top of the result card) | Preset 6/42 … 6/58. Sets range `1…N` and loads that sheet. |
+| **Get today's numbers / New numbers** | Draws the set. In Daily mode it turns into **Saved for today** once used. |
+| **Copy** | Copies the six numbers to the clipboard. |
+| **Daily / Manual** | Daily: one set per game per calendar day, saved in this browser until midnight. Manual: draw whenever you want. |
+| **Range** (Tune the field) | Editable min/max. A custom range drops official-game history. |
+| **Detail** | FBM octaves (1 = smooth, 4–6 = more bumps). |
+| **Hills** | FBM scale: how many hills are stretched across the pool. |
 | **History weight (α)** | Mix of live FBM vs 10-year frequency. `0` = field only; default `0.35`. |
 | **Seed** | Optional. Applied the next time you generate. |
-| **Draw → Daily** | One set per game per calendar day, saved in this browser until midnight. |
-| **Draw → Manual** | Click **Generate** whenever you want a new set. Nothing auto-refreshes. |
-| **Sheet** | Row count and last fetch. “Cached” means sessionStorage, not a new Google hit. |
+| **Data** / header pill | Row count and last fetch. “Cached” means sessionStorage, not a new Google hit. |
 
-The six cards are the current peaks. The bar chart is the live field (gold = picks; muted bars = historical frequency). Orbit is the same pool as points of light. **Recent draws** are the last eight official results from the sheet.
+The six cards are the current picks, sorted ascending, with a peak-strength bar. The bar chart is the live field (gold = picks; muted bars = historical frequency). Orbit view is the same pool as points of light. **Recent official draws** are the last eight results from the sheet; numbers that also appear in your set are gold.
+
+## Design and motion
+
+The look follows [godsviewai.com](https://godsviewai.com/): neutral near-black surfaces, warm off-white ink, 2px corners, gold for highlights, and a labelled icon rail. Tokens live at the top of `src/style.css`.
+
+- **Type:** [Switzer](https://www.fontshare.com/fonts/switzer) (Fontshare, ITF Free Font License, free for commercial use) for text, IBM Plex Mono (OFL) for numbers and data only.
+- **Icons:** Lucide, copied from [Iconify](https://icon-sets.iconify.design/lucide/) into the SVG sprite in `index.html`. Colour and stroke come from CSS.
+- **Charts:** live SVG (`src/ui/charts.js`). Mark colours are CSS classes (`.c-bar`, `.c-dot`, …) driven by the `--chart-*` tokens.
+- **Motion:** GSAP 3 only (`src/ui/motion.js`): ScrollSmoother, a pinned hero, SplitText heading reveals, per-section scroll entrances, and the pick-card reveal. With `prefers-reduced-motion`, smoothing, pinning and movement are off, state changes fade, and the field holds a still frame.
+- **Hero icon:** set `LORDICON_SRC` in `src/config.js` to a Lordicon CDN link to play it once on load (the footer adds the required credit). Empty = the built-in SVG eye draws itself.
+- **Particle reveal:** Canvas UI's effect is installed through the shadcn registry (`src/components/canvasui/`) but off (`PARTICLE_REVEAL` in `src/config.js`). It needs Chrome's experimental HTML-in-Canvas API.
 
 Bottom metrics describe the **lab field**, not winning odds:
 
@@ -83,7 +94,8 @@ src/config.js       # games + sheet URL helper
 src/engine/         # FBM, LCG / Box–Muller / OU, peak pick
 src/data/sheets.js  # CSV fetch + parse + stats
 src/data/daily.js   # daily lock in localStorage
-src/ui/             # DOM + canvases
+src/ui/             # DOM, SVG charts, GSAP motion
+src/components/     # Canvas UI particle reveal (shadcn registry)
 Dockerfile          # Cloud Run image (nginx + sheet proxy)
 cloudbuild.yaml     # build image and deploy Cloud Run
 netlify.toml        # optional Netlify static build

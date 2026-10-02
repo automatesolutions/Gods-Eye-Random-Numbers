@@ -56,3 +56,20 @@ export const PAIR_GAMMA = 0.18;
 export const HISTORY_CACHE_MS = 10 * 60 * 1000;
 export const DRIFT_X = 0.18;
 export const DRIFT_Y = 0.31;
+
+/**
+ * Lordicon animation shown above the hero heading, played once on load.
+ * Paste the CDN link from lordicon.com (Embed > HTML), e.g.
+ * 'https://cdn.lordicon.com/xxxxxxxx.json'. Free icons need the author
+ * credit, which the footer adds automatically when this is set.
+ * Empty = the built-in SVG eye draws itself instead.
+ */
+export const LORDICON_SRC = '';
+
+/**
+ * Canvas UI "Particle Reveal" on the hero heading. Off by default: it needs
+ * Chrome's experimental HTML-in-Canvas API (behind a flag, so almost no
+ * visitors have it), it shows the headline as dust until hovered, and in
+ * testing it rendered offset from the heading. Turn on to experiment.
+ */
+export const PARTICLE_REVEAL = false;

@@ -15,8 +15,9 @@ import {
   writeDaily,
   writeDrawMode,
 } from './data/daily.js';
-import { drawHeat, drawOrbit } from './ui/canvas.js';
-import { bindControls, mountChips, renderChrome } from './ui/render.js';
+import { createHeat, createOrbit } from './ui/charts.js';
+import { initMotion } from './ui/motion.js';
+import { bindControls, flashCopied, mountChips, renderChrome } from './ui/render.js';
 
 const defaultGame = GAMES.find((g) => g.id === DEFAULT_GAME) || GAMES[2];
 
@@ -36,12 +37,21 @@ const state = {
   sep: 0,
   stats: null,
   recentDraws: [],
-  sheetStatus: 'history offline',
+  sheetStatus: '',
   sheetError: null,
+  sheetLoading: false,
 };
 
-const heat = document.getElementById('heat');
-const orbit = document.getElementById('orbit');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+const drawHeat = createHeat(document.getElementById('heat'));
+const drawOrbit = createOrbit(document.getElementById('orbit'));
+const introOrbitEl = document.getElementById('intro-orbit');
+const drawIntroOrbit = createOrbit(introOrbitEl, { labels: false });
+let introVisible = true;
+new IntersectionObserver((entries) => {
+  introVisible = entries[entries.length - 1].isIntersecting;
+}).observe(introOrbitEl);
 
 let vals = [];
 let chosen = new Set();
@@ -51,6 +61,13 @@ let ou = 0;
 let rng = Math.random;
 let raf = 0;
 let histToken = 0;
+let dirty = true;
+let commitT = 0;
+
+function render() {
+  dirty = true;
+  renderChrome(state);
+}
 
 function formatFetched(ms) {
   try {
@@ -77,7 +94,7 @@ function applyCommit(result, persistDaily) {
   } else if (state.drawMode === 'manual') {
     state.dailyLocked = false;
   }
-  renderChrome(state);
+  render();
 }
 
 function restoreSaved(saved) {
@@ -86,7 +103,7 @@ function restoreSaved(saved) {
   state.energy = saved.energy ?? 0;
   chosen = new Set(saved.chosen || saved.picks.map((p) => p.n));
   state.dailyLocked = state.drawMode === 'daily';
-  renderChrome(state);
+  render();
 }
 
 function sample(t) {
@@ -105,6 +122,7 @@ function sample(t) {
 
 function commitNow(persistDaily) {
   const t = (performance.now() - t0) / 1000;
+  commitT = t;
   vals = sample(t);
   applyCommit(commitPeaks(vals, PICK_COUNT, state.stats), persistDaily);
 }
@@ -121,7 +139,7 @@ function settleDraw() {
   }
   state.dailyLocked = false;
   if (!state.picks.length) commitNow(false);
-  else renderChrome(state);
+  else render();
 }
 
 function generate() {
@@ -133,22 +151,24 @@ async function loadGameHistory() {
   const token = ++histToken;
   const game = GAMES.find((g) => g.id === state.gameId);
   const max = game ? game.max : state.max;
-  state.sheetStatus = 'loading…';
+  state.sheetStatus = 'Loading…';
   state.sheetError = null;
-  renderChrome(state);
+  state.sheetLoading = true;
+  render();
   const result = await loadHistory(state.gameId, max);
   if (token !== histToken) return;
+  state.sheetLoading = false;
   state.stats = result.stats;
   state.recentDraws = result.draws.slice(-8).reverse();
   state.sheetError = result.error;
   if (result.offline && !result.error) {
-    state.sheetStatus = 'history offline · uniform prior';
+    state.sheetStatus = 'No sheet set for this game. Using equal weight.';
   } else if (result.error && !result.draws.length) {
-    state.sheetStatus = 'sheet error: ' + result.error;
+    state.sheetStatus = 'Sheet error: ' + result.error;
   } else {
-    const when = result.fetchedAt ? ' · fetched ' + formatFetched(result.fetchedAt) : '';
-    const tag = result.cached ? ' · cached' : '';
-    state.sheetStatus = result.stats.count.toLocaleString() + ' draws' + when + tag;
+    const when = result.fetchedAt ? ', updated ' + formatFetched(result.fetchedAt) : '';
+    const tag = result.cached ? ' (cached)' : '';
+    state.sheetStatus = result.stats.count.toLocaleString() + ' past draws' + when + tag;
   }
   settleDraw();
 }
@@ -181,7 +201,7 @@ function setRange(min, max) {
     state.gameId = '';
     state.stats = null;
     state.recentDraws = [];
-    state.sheetStatus = 'custom range · uniform prior';
+    state.sheetStatus = 'Custom range. Past draws not used.';
     state.sheetError = null;
   }
   settleDraw();
@@ -193,28 +213,40 @@ function setMode(mode) {
   settleDraw();
 }
 
+async function copyPicks() {
+  if (!state.picks.length) return;
+  const text = state.picks.map((p) => p.label).join(' ');
+  try {
+    await navigator.clipboard.writeText(text);
+    flashCopied(true);
+  } catch {
+    flashCopied(false);
+  }
+}
+
 mountChips(setGame);
 bindControls({
   onMin: (v) => setRange(parseInt(v, 10), state.max),
   onMax: (v) => setRange(state.min, parseInt(v, 10)),
   onOct: (v) => {
     state.octaves = parseInt(v, 10);
-    renderChrome(state);
+    render();
   },
   onScale: (v) => {
     state.scaleRaw = parseInt(v, 10);
-    renderChrome(state);
+    render();
   },
   onAlpha: (v) => {
     state.historyAlpha = parseInt(v, 10) / 100;
-    renderChrome(state);
+    render();
   },
   onSeed: (v) => {
     state.seed = v;
     rng = createRng(state.seed);
-    renderChrome(state);
+    render();
   },
   onGenerate: generate,
+  onCopy: copyPicks,
   onMode: setMode,
 });
 
@@ -225,17 +257,31 @@ function loop(now) {
   const t = (now - t0) / 1000;
   const dt = Math.min(0.05, (now - lastOu) / 1000 || 0.016);
   lastOu = now;
+  if (reduceMotion.matches) {
+    // Hold a still frame; redraw only when something changed.
+    if (!dirty) return;
+    dirty = false;
+    vals = sample(commitT);
+    drawHeat(vals, chosen, Boolean(state.stats?.loaded));
+    drawOrbit(vals, chosen, commitT);
+    drawIntroOrbit(vals, chosen, commitT);
+    return;
+  }
   ou = ouStep(ou, 1.2, 0, 0.12, dt, gaussian(rng));
   vals = sample(t);
-  drawHeat(heat, vals, chosen, Boolean(state.stats?.loaded));
-  drawOrbit(orbit, vals, chosen, t);
+  drawHeat(vals, chosen, Boolean(state.stats?.loaded));
+  drawOrbit(vals, chosen, t);
+  if (introVisible) drawIntroOrbit(vals, chosen, t);
 }
 
 t0 = performance.now();
 lastOu = t0;
 rng = createRng(state.seed);
-renderChrome(state);
+render();
 raf = requestAnimationFrame(loop);
 loadGameHistory();
+initMotion();
 
+window.addEventListener('resize', () => { dirty = true; });
+reduceMotion.addEventListener?.('change', () => { dirty = true; });
 window.addEventListener('beforeunload', () => cancelAnimationFrame(raf));
